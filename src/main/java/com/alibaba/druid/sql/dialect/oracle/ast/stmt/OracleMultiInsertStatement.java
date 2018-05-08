@@ -1,5 +1,5 @@
 /*
- * Copyright 1999-2101 Alibaba Group Holding Ltd.
+ * Copyright 1999-2018 Alibaba Group Holding Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,11 +20,11 @@ import java.util.List;
 
 import com.alibaba.druid.sql.ast.SQLExpr;
 import com.alibaba.druid.sql.ast.SQLHint;
+import com.alibaba.druid.sql.ast.statement.SQLErrorLoggingClause;
 import com.alibaba.druid.sql.ast.statement.SQLInsertInto;
 import com.alibaba.druid.sql.ast.statement.SQLSelect;
 import com.alibaba.druid.sql.dialect.oracle.ast.OracleSQLObject;
 import com.alibaba.druid.sql.dialect.oracle.ast.OracleSQLObjectImpl;
-import com.alibaba.druid.sql.dialect.oracle.ast.clause.OracleErrorLoggingClause;
 import com.alibaba.druid.sql.dialect.oracle.ast.clause.OracleReturningClause;
 import com.alibaba.druid.sql.dialect.oracle.visitor.OracleASTVisitor;
 import com.alibaba.druid.sql.visitor.SQLASTVisitor;
@@ -158,7 +158,7 @@ public class OracleMultiInsertStatement extends OracleStatementImpl {
     public static class InsertIntoClause extends SQLInsertInto implements OracleSQLObject, Entry {
 
         private OracleReturningClause    returning;
-        private OracleErrorLoggingClause errorLogging;
+        private SQLErrorLoggingClause errorLogging;
 
         public InsertIntoClause(){
 
@@ -172,11 +172,11 @@ public class OracleMultiInsertStatement extends OracleStatementImpl {
             this.returning = returning;
         }
 
-        public OracleErrorLoggingClause getErrorLogging() {
+        public SQLErrorLoggingClause getErrorLogging() {
             return errorLogging;
         }
 
-        public void setErrorLogging(OracleErrorLoggingClause errorLogging) {
+        public void setErrorLogging(SQLErrorLoggingClause errorLogging) {
             this.errorLogging = errorLogging;
         }
 
@@ -197,6 +197,22 @@ public class OracleMultiInsertStatement extends OracleStatementImpl {
             }
 
             visitor.endVisit(this);
+        }
+
+        public void cloneTo(InsertIntoClause x) {
+            super.cloneTo(x);
+            if (returning != null) {
+                x.setReturning(returning.clone());
+            }
+            if (errorLogging != null) {
+                x.setErrorLogging(errorLogging.clone());
+            }
+        }
+
+        public InsertIntoClause clone() {
+            InsertIntoClause x = new InsertIntoClause();
+            cloneTo(x);
+            return x;
         }
     }
 }

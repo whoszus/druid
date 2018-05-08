@@ -1,5 +1,5 @@
 /*
- * Copyright 1999-2101 Alibaba Group Holding Ltd.
+ * Copyright 1999-2018 Alibaba Group Holding Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,18 +19,38 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.alibaba.druid.sql.ast.SQLHint;
+import com.alibaba.druid.sql.ast.statement.SQLErrorLoggingClause;
 import com.alibaba.druid.sql.ast.statement.SQLInsertStatement;
-import com.alibaba.druid.sql.dialect.oracle.ast.clause.OracleErrorLoggingClause;
 import com.alibaba.druid.sql.dialect.oracle.ast.clause.OracleReturningClause;
 import com.alibaba.druid.sql.dialect.oracle.visitor.OracleASTVisitor;
 import com.alibaba.druid.sql.dialect.oracle.visitor.OracleOutputVisitor;
 import com.alibaba.druid.sql.visitor.SQLASTVisitor;
+import com.alibaba.druid.util.JdbcConstants;
 
 public class OracleInsertStatement extends SQLInsertStatement implements OracleStatement {
 
-    private OracleReturningClause    returning;
-    private OracleErrorLoggingClause errorLogging;
-    private List<SQLHint>            hints = new ArrayList<SQLHint>();
+    private OracleReturningClause returning;
+    private SQLErrorLoggingClause errorLogging;
+    private List<SQLHint>         hints = new ArrayList<SQLHint>();
+
+    public OracleInsertStatement() {
+        dbType = JdbcConstants.ORACLE;
+    }
+
+    public void cloneTo(OracleInsertStatement x) {
+        super.cloneTo(x);
+        if (returning != null) {
+            x.setReturning(returning.clone());
+        }
+        if (errorLogging != null) {
+            x.setErrorLogging(errorLogging.clone());
+        }
+        for (SQLHint hint : hints) {
+            SQLHint h2 = hint.clone();
+            h2.setParent(x);
+            x.hints.add(h2);
+        }
+    }
 
     public List<SQLHint> getHints() {
         return hints;
@@ -48,11 +68,11 @@ public class OracleInsertStatement extends SQLInsertStatement implements OracleS
         this.returning = returning;
     }
 
-    public OracleErrorLoggingClause getErrorLogging() {
+    public SQLErrorLoggingClause getErrorLogging() {
         return errorLogging;
     }
 
-    public void setErrorLogging(OracleErrorLoggingClause errorLogging) {
+    public void setErrorLogging(SQLErrorLoggingClause errorLogging) {
         this.errorLogging = errorLogging;
     }
 
@@ -76,5 +96,11 @@ public class OracleInsertStatement extends SQLInsertStatement implements OracleS
     
     public void output(StringBuffer buf) {
     	new OracleOutputVisitor(buf).visit(this);
+    }
+
+    public OracleInsertStatement clone() {
+        OracleInsertStatement x = new OracleInsertStatement();
+        cloneTo(x);
+        return x;
     }
 }

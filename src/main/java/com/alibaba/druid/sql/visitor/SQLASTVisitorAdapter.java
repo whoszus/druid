@@ -1,5 +1,5 @@
 /*
- * Copyright 1999-2101 Alibaba Group Holding Ltd.
+ * Copyright 1999-2018 Alibaba Group Holding Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,60 +15,18 @@
  */
 package com.alibaba.druid.sql.visitor;
 
-import com.alibaba.druid.sql.ast.SQLCommentHint;
-import com.alibaba.druid.sql.ast.SQLDataType;
-import com.alibaba.druid.sql.ast.SQLDeclareItem;
-import com.alibaba.druid.sql.ast.SQLExpr;
-import com.alibaba.druid.sql.ast.SQLKeep;
-import com.alibaba.druid.sql.ast.SQLObject;
-import com.alibaba.druid.sql.ast.SQLOrderBy;
-import com.alibaba.druid.sql.ast.SQLOver;
-import com.alibaba.druid.sql.ast.SQLParameter;
-import com.alibaba.druid.sql.ast.SQLPartition;
-import com.alibaba.druid.sql.ast.SQLPartitionByHash;
-import com.alibaba.druid.sql.ast.SQLPartitionByList;
-import com.alibaba.druid.sql.ast.SQLPartitionByRange;
-import com.alibaba.druid.sql.ast.SQLPartitionValue;
-import com.alibaba.druid.sql.ast.SQLSubPartition;
-import com.alibaba.druid.sql.ast.SQLSubPartitionByHash;
-import com.alibaba.druid.sql.ast.SQLSubPartitionByList;
-import com.alibaba.druid.sql.ast.expr.SQLAggregateExpr;
-import com.alibaba.druid.sql.ast.expr.SQLAllColumnExpr;
-import com.alibaba.druid.sql.ast.expr.SQLAllExpr;
-import com.alibaba.druid.sql.ast.expr.SQLAnyExpr;
-import com.alibaba.druid.sql.ast.expr.SQLArrayExpr;
-import com.alibaba.druid.sql.ast.expr.SQLBetweenExpr;
-import com.alibaba.druid.sql.ast.expr.SQLBinaryExpr;
-import com.alibaba.druid.sql.ast.expr.SQLBinaryOpExpr;
-import com.alibaba.druid.sql.ast.expr.SQLBooleanExpr;
-import com.alibaba.druid.sql.ast.expr.SQLCaseExpr;
-import com.alibaba.druid.sql.ast.expr.SQLCastExpr;
-import com.alibaba.druid.sql.ast.expr.SQLCharExpr;
-import com.alibaba.druid.sql.ast.expr.SQLCurrentOfCursorExpr;
-import com.alibaba.druid.sql.ast.expr.SQLDefaultExpr;
-import com.alibaba.druid.sql.ast.expr.SQLExistsExpr;
-import com.alibaba.druid.sql.ast.expr.SQLGroupingSetExpr;
-import com.alibaba.druid.sql.ast.expr.SQLHexExpr;
-import com.alibaba.druid.sql.ast.expr.SQLIdentifierExpr;
-import com.alibaba.druid.sql.ast.expr.SQLInListExpr;
-import com.alibaba.druid.sql.ast.expr.SQLInSubQueryExpr;
-import com.alibaba.druid.sql.ast.expr.SQLIntegerExpr;
-import com.alibaba.druid.sql.ast.expr.SQLListExpr;
-import com.alibaba.druid.sql.ast.expr.SQLMethodInvokeExpr;
-import com.alibaba.druid.sql.ast.expr.SQLNCharExpr;
-import com.alibaba.druid.sql.ast.expr.SQLNotExpr;
-import com.alibaba.druid.sql.ast.expr.SQLNullExpr;
-import com.alibaba.druid.sql.ast.expr.SQLNumberExpr;
-import com.alibaba.druid.sql.ast.expr.SQLPropertyExpr;
-import com.alibaba.druid.sql.ast.expr.SQLQueryExpr;
-import com.alibaba.druid.sql.ast.expr.SQLSomeExpr;
-import com.alibaba.druid.sql.ast.expr.SQLTimestampExpr;
-import com.alibaba.druid.sql.ast.expr.SQLUnaryExpr;
-import com.alibaba.druid.sql.ast.expr.SQLVariantRefExpr;
+import com.alibaba.druid.sql.ast.*;
+import com.alibaba.druid.sql.ast.expr.*;
 import com.alibaba.druid.sql.ast.statement.*;
 import com.alibaba.druid.sql.ast.statement.SQLInsertStatement.ValuesClause;
+import com.alibaba.druid.sql.ast.statement.SQLMergeStatement.MergeInsertClause;
+import com.alibaba.druid.sql.ast.statement.SQLMergeStatement.MergeUpdateClause;
+import com.alibaba.druid.sql.ast.statement.SQLWhileStatement;
+import com.alibaba.druid.sql.ast.statement.SQLDeclareStatement;
+import com.alibaba.druid.sql.ast.statement.SQLCommitStatement;
 
 public class SQLASTVisitorAdapter implements SQLASTVisitor {
+    protected int features;
 
     public void endVisit(SQLAllColumnExpr x) {
     }
@@ -83,6 +41,12 @@ public class SQLASTVisitorAdapter implements SQLASTVisitor {
     }
 
     public void endVisit(SQLCaseExpr.Item x) {
+    }
+
+    public void endVisit(SQLCaseStatement x) {
+    }
+
+    public void endVisit(SQLCaseStatement.Item x) {
     }
 
     public void endVisit(SQLCharExpr x) {
@@ -147,6 +111,14 @@ public class SQLASTVisitorAdapter implements SQLASTVisitor {
     }
 
     public boolean visit(SQLCaseExpr.Item x) {
+        return true;
+    }
+
+    public boolean visit(SQLCaseStatement x) {
+        return true;
+    }
+
+    public boolean visit(SQLCaseStatement.Item x) {
         return true;
     }
 
@@ -342,6 +314,13 @@ public class SQLASTVisitorAdapter implements SQLASTVisitor {
     public void endVisit(SQLCreateViewStatement x) {
     }
 
+    public boolean visit(SQLAlterViewStatement x) {
+        return true;
+    }
+
+    public void endVisit(SQLAlterViewStatement x) {
+    }
+
     public boolean visit(SQLCreateViewStatement.Column x) {
         return true;
     }
@@ -349,11 +328,11 @@ public class SQLASTVisitorAdapter implements SQLASTVisitor {
     public void endVisit(SQLCreateViewStatement.Column x) {
     }
 
-    public boolean visit(NotNullConstraint x) {
+    public boolean visit(SQLNotNullConstraint x) {
         return true;
     }
 
-    public void endVisit(NotNullConstraint x) {
+    public void endVisit(SQLNotNullConstraint x) {
     }
 
     @Override
@@ -588,7 +567,7 @@ public class SQLASTVisitorAdapter implements SQLASTVisitor {
 
     @Override
     public boolean visit(SQLSavePointStatement x) {
-        return true;
+        return false;
     }
 
     @Override
@@ -833,7 +812,7 @@ public class SQLASTVisitorAdapter implements SQLASTVisitor {
 
     @Override
     public boolean visit(SQLUnique x) {
-        for (SQLExpr column : x.getColumns()) {
+        for (SQLSelectOrderByItem column : x.getColumns()) {
             column.accept(this);
         }
         return false;
@@ -1285,6 +1264,16 @@ public class SQLASTVisitorAdapter implements SQLASTVisitor {
     }
 
     @Override
+    public boolean visit(SQLCreateFunctionStatement x) {
+        return true;
+    }
+
+    @Override
+    public void endVisit(SQLCreateFunctionStatement x) {
+
+    }
+
+    @Override
     public boolean visit(SQLBlockStatement x) {
         return true;
     }
@@ -1513,4 +1502,514 @@ public class SQLASTVisitorAdapter implements SQLASTVisitor {
 
     }
     
+    @Override
+    public boolean visit(SQLSequenceExpr x) {
+        return true;
+    }
+    
+    @Override
+    public void endVisit(SQLSequenceExpr x) {
+        
+    }
+
+    @Override
+    public boolean visit(SQLMergeStatement x) {
+        return true;
+    }
+
+    @Override
+    public void endVisit(SQLMergeStatement x) {
+        
+    }
+
+    @Override
+    public boolean visit(MergeUpdateClause x) {
+        return true;
+    }
+
+    @Override
+    public void endVisit(MergeUpdateClause x) {
+        
+    }
+
+    @Override
+    public boolean visit(MergeInsertClause x) {
+        return true;
+    }
+
+    @Override
+    public void endVisit(MergeInsertClause x) {
+        
+    }
+
+    @Override
+    public boolean visit(SQLErrorLoggingClause x) {
+        return true;
+    }
+
+    @Override
+    public void endVisit(SQLErrorLoggingClause x) {
+
+    }
+
+    @Override
+    public boolean visit(SQLNullConstraint x) {
+	return true;
+    }
+
+    @Override
+    public void endVisit(SQLNullConstraint x) {
+    }
+
+    @Override
+    public boolean visit(SQLCreateSequenceStatement x) {
+        return true;
+    }
+
+    @Override
+    public void endVisit(SQLCreateSequenceStatement x) {
+    }
+
+    @Override
+    public boolean visit(SQLDateExpr x) {
+        return true;
+    }
+
+    @Override
+    public void endVisit(SQLDateExpr x) {
+
+    }
+
+    @Override
+    public boolean visit(SQLLimit x) {
+        return true;
+    }
+
+    @Override
+    public void endVisit(SQLLimit x) {
+
+    }
+
+    @Override
+    public void endVisit(SQLStartTransactionStatement x) {
+
+    }
+
+    @Override
+    public boolean visit(SQLStartTransactionStatement x) {
+        return true;
+    }
+
+    @Override
+    public void endVisit(SQLDescribeStatement x) {
+
+    }
+
+    @Override
+    public boolean visit(SQLDescribeStatement x) {
+        return true;
+    }
+
+    @Override
+    public boolean visit(SQLWhileStatement x) {
+        return true;
+    }
+
+    @Override
+    public void endVisit(SQLWhileStatement x) {
+
+    }
+
+
+    @Override
+    public boolean visit(SQLDeclareStatement x) {
+        return true;
+    }
+
+    @Override
+    public void endVisit(SQLDeclareStatement x) {
+
+    }
+
+    @Override
+    public boolean visit(SQLReturnStatement x) {
+        return true;
+    }
+
+    @Override
+    public void endVisit(SQLReturnStatement x) {
+
+    }
+
+    @Override
+    public boolean visit(SQLArgument x) {
+        return true;
+    }
+
+    @Override
+    public void endVisit(SQLArgument x) {
+
+    }
+
+    @Override
+    public boolean visit(SQLCommitStatement x) {
+        return true;
+    }
+
+    @Override
+    public void endVisit(SQLCommitStatement x) {
+
+    }
+
+    @Override
+    public boolean visit(SQLFlashbackExpr x) {
+        return true;
+    }
+
+    @Override
+    public void endVisit(SQLFlashbackExpr x) {
+
+    }
+
+    @Override
+    public boolean visit(SQLCreateMaterializedViewStatement x) {
+        return true;
+    }
+
+    @Override
+    public void endVisit(SQLCreateMaterializedViewStatement x) {
+
+    }
+
+    @Override
+    public boolean visit(SQLBinaryOpExprGroup x) {
+        return true;
+    }
+
+    @Override
+    public void endVisit(SQLBinaryOpExprGroup x) {
+
+    }
+
+    public void config(VisitorFeature feature, boolean state) {
+        features = VisitorFeature.config(features, feature, state);
+    }
+
+    @Override
+    public boolean visit(SQLScriptCommitStatement x) {
+        return true;
+    }
+
+    @Override
+    public void endVisit(SQLScriptCommitStatement x) {
+
+    }
+
+    @Override
+    public boolean visit(SQLReplaceStatement x) {
+        return true;
+    }
+
+    @Override
+    public void endVisit(SQLReplaceStatement x) {
+
+    }
+
+    @Override
+    public boolean visit(SQLCreateUserStatement x) {
+        return true;
+    }
+
+    @Override
+    public void endVisit(SQLCreateUserStatement x) {
+
+    }
+
+    @Override
+    public boolean visit(SQLAlterFunctionStatement x) {
+        return true;
+    }
+
+    @Override
+    public void endVisit(SQLAlterFunctionStatement x) {
+
+    }
+
+    @Override
+    public boolean visit(SQLAlterTypeStatement x) {
+        return true;
+    }
+
+    @Override
+    public void endVisit(SQLAlterTypeStatement x) {
+
+    }
+
+    @Override
+    public boolean visit(SQLIntervalExpr x) {
+        return true;
+    }
+
+    @Override
+    public void endVisit(SQLIntervalExpr x) {
+
+    }
+
+    @Override
+    public boolean visit(SQLLateralViewTableSource x) {
+        return true;
+    }
+
+    @Override
+    public void endVisit(SQLLateralViewTableSource x) {
+
+    }
+
+    @Override
+    public boolean visit(SQLShowErrorsStatement x) {
+        return true;
+    }
+
+    @Override
+    public void endVisit(SQLShowErrorsStatement x) {
+
+    }
+
+    @Override
+    public boolean visit(SQLAlterCharacter x) {
+        return true;
+    }
+
+    @Override
+    public void endVisit(SQLAlterCharacter x) {
+
+    }
+
+    @Override
+    public boolean visit(SQLExprStatement x) {
+        return true;
+    }
+
+    @Override
+    public void endVisit(SQLExprStatement x) {
+
+    }
+
+    @Override
+    public boolean visit(SQLAlterProcedureStatement x) {
+        return true;
+    }
+
+    @Override
+    public void endVisit(SQLAlterProcedureStatement x) {
+
+    }
+
+    @Override
+    public boolean visit(SQLDropEventStatement x) {
+        return true;
+    }
+
+    @Override
+    public void endVisit(SQLDropEventStatement x) {
+
+    }
+
+    @Override
+    public boolean visit(SQLDropLogFileGroupStatement x) {
+        return true;
+    }
+
+    @Override
+    public void endVisit(SQLDropLogFileGroupStatement x) {
+
+    }
+
+    @Override
+    public boolean visit(SQLDropServerStatement x) {
+        return true;
+    }
+
+    @Override
+    public void endVisit(SQLDropServerStatement x) {
+
+    }
+
+    @Override
+    public boolean visit(SQLDropSynonymStatement x) {
+        return true;
+    }
+
+    @Override
+    public void endVisit(SQLDropSynonymStatement x) {
+
+    }
+
+    @Override
+    public boolean visit(SQLDropTypeStatement x) {
+        return true;
+    }
+
+    @Override
+    public void endVisit(SQLDropTypeStatement x) {
+
+    }
+
+    @Override
+    public boolean visit(SQLRecordDataType x) {
+        return true;
+    }
+
+    @Override
+    public void endVisit(SQLRecordDataType x) {
+
+    }
+
+    public boolean visit(SQLExternalRecordFormat x) {
+        return true;
+    }
+
+    public void endVisit(SQLExternalRecordFormat x) {
+
+    }
+
+    @Override
+    public boolean visit(SQLArrayDataType x) {
+        return true;
+    }
+
+    @Override
+    public void endVisit(SQLArrayDataType x) {
+
+    }
+
+    @Override
+    public boolean visit(SQLMapDataType x) {
+        return true;
+    }
+
+    @Override
+    public void endVisit(SQLMapDataType x) {
+
+    }
+
+    @Override
+    public boolean visit(SQLStructDataType x) {
+        return true;
+    }
+
+    @Override
+    public void endVisit(SQLStructDataType x) {
+
+    }
+
+    @Override
+    public boolean visit(SQLStructDataType.Field x) {
+        return true;
+    }
+
+    @Override
+    public void endVisit(SQLStructDataType.Field x) {
+
+    }
+
+    @Override
+    public boolean visit(SQLDropMaterializedViewStatement x) {
+        return true;
+    }
+
+    @Override
+    public void endVisit(SQLDropMaterializedViewStatement x) {
+
+    }
+
+    @Override
+    public boolean visit(SQLAlterTableRenameIndex x) {
+        return true;
+    }
+
+    @Override
+    public void endVisit(SQLAlterTableRenameIndex x) {
+
+    }
+
+    @Override
+    public boolean visit(SQLAlterSequenceStatement x) {
+        return true;
+    }
+
+    @Override
+    public void endVisit(SQLAlterSequenceStatement x) {
+
+    }
+
+    @Override
+    public boolean visit(SQLAlterTableExchangePartition x) {
+        return true;
+    }
+
+    @Override
+    public void endVisit(SQLAlterTableExchangePartition x) {
+
+    }
+
+    @Override
+    public boolean visit(SQLValuesExpr x) {
+        return true;
+    }
+
+    @Override
+    public void endVisit(SQLValuesExpr x) {
+
+    }
+
+    @Override
+    public boolean visit(SQLValuesTableSource x) {
+        return true;
+    }
+
+    public void endVisit(SQLValuesTableSource x) {
+
+    }
+
+    @Override
+    public boolean visit(SQLContainsExpr x) {
+        return true;
+    }
+
+    public void endVisit(SQLContainsExpr x) {
+
+    }
+
+    @Override
+    public boolean visit(SQLRealExpr x) {
+        return true;
+    }
+
+    public void endVisit(SQLRealExpr x) {
+
+    }
+
+
+    @Override
+    public boolean visit(SQLWindow x) {
+        return true;
+    }
+
+    public void endVisit(SQLWindow x) {
+
+    }
+
+
+    public final boolean isEnabled(VisitorFeature feature) {
+        return VisitorFeature.isEnabled(this.features, feature);
+    }
+
+    public int getFeatures() {
+        return features;
+    }
+
+    public void setFeatures(int features) {
+        this.features = features;
+    }
 }

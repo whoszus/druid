@@ -1,5 +1,5 @@
 /*
- * Copyright 1999-2101 Alibaba Group Holding Ltd.
+ * Copyright 1999-2018 Alibaba Group Holding Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,10 +25,11 @@ import com.alibaba.druid.sql.ast.expr.SQLInListExpr;
 import com.alibaba.druid.sql.ast.expr.SQLMethodInvokeExpr;
 import com.alibaba.druid.sql.ast.statement.SQLSelectGroupByClause;
 import com.alibaba.druid.sql.ast.statement.SQLSelectItem;
+import com.alibaba.druid.sql.dialect.db2.ast.stmt.DB2CreateTableStatement;
 import com.alibaba.druid.sql.visitor.ExportParameterVisitor;
 import com.alibaba.druid.sql.visitor.ExportParameterVisitorUtils;
 
-public class DB2ExportParameterVisitor extends DB2ParameterizedOutputVisitor implements ExportParameterVisitor {
+public class DB2ExportParameterVisitor extends DB2OutputVisitor implements ExportParameterVisitor {
 
 
     /**
@@ -37,7 +38,7 @@ public class DB2ExportParameterVisitor extends DB2ParameterizedOutputVisitor imp
     private final boolean requireParameterizedOutput;
 
     public DB2ExportParameterVisitor(final List<Object> parameters,final Appendable appender,final boolean wantParameterizedOutput){
-        super(appender);
+        super(appender, true);
         this.parameters = parameters;
         this.requireParameterizedOutput = wantParameterizedOutput;
     }
@@ -120,4 +121,8 @@ public class DB2ExportParameterVisitor extends DB2ParameterizedOutputVisitor imp
         return true;
     }
 
+    @Override
+    public void endVisit(DB2CreateTableStatement x) {
+
+    }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 1999-2101 Alibaba Group Holding Ltd.
+ * Copyright 1999-2018 Alibaba Group Holding Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,56 +15,42 @@
  */
 package com.alibaba.druid.sql.dialect.mysql.ast.statement;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.alibaba.druid.sql.ast.SQLExpr;
+import com.alibaba.druid.sql.ast.SQLName;
 import com.alibaba.druid.sql.ast.SQLOrderBy;
-import com.alibaba.druid.sql.ast.statement.SQLSelectItem;
 import com.alibaba.druid.sql.ast.statement.SQLUpdateStatement;
-import com.alibaba.druid.sql.dialect.mysql.ast.statement.MySqlSelectQueryBlock.Limit;
+import com.alibaba.druid.sql.ast.SQLLimit;
 import com.alibaba.druid.sql.dialect.mysql.visitor.MySqlASTVisitor;
 import com.alibaba.druid.sql.visitor.SQLASTVisitor;
 import com.alibaba.druid.util.JdbcConstants;
 
 public class MySqlUpdateStatement extends SQLUpdateStatement implements MySqlStatement {
+    private SQLLimit limit;
 
-    private SQLOrderBy          orderBy;
-    private Limit               limit;
-
-    private boolean             lowPriority     = false;
-    private boolean             ignore          = false;
-    private boolean             commitOnSuccess = false;
-    private boolean             rollBackOnFail  = false;
-    private boolean             queryOnPk       = false;
+    private boolean             lowPriority        = false;
+    private boolean             ignore             = false;
+    private boolean             commitOnSuccess    = false;
+    private boolean             rollBackOnFail     = false;
+    private boolean             queryOnPk          = false;
     private SQLExpr             targetAffectRow;
 
-    private List<SQLSelectItem> returning       = new ArrayList<SQLSelectItem>();
+    // for petadata
+    private boolean             forceAllPartitions = false;
+    private SQLName             forcePartition;
 
     public MySqlUpdateStatement(){
         super(JdbcConstants.MYSQL);
     }
 
-    public Limit getLimit() {
+    public SQLLimit getLimit() {
         return limit;
     }
 
-    public void setLimit(Limit limit) {
+    public void setLimit(SQLLimit limit) {
         if (limit != null) {
             limit.setParent(this);
         }
         this.limit = limit;
-    }
-
-    public List<SQLSelectItem> getReturning() {
-        return returning;
-    }
-
-    public void addReturning(List<SQLSelectItem> returning) {
-        for (SQLSelectItem item : returning) {
-            item.setParent(this);
-            this.returning.add(item);
-        }
     }
 
     @Override
@@ -72,7 +58,7 @@ public class MySqlUpdateStatement extends SQLUpdateStatement implements MySqlSta
         if (visitor instanceof MySqlASTVisitor) {
             accept0((MySqlASTVisitor) visitor);
         } else {
-            throw new IllegalArgumentException("not support visitor type : " + visitor.getClass().getName());
+            super.accept0(visitor);
         }
     }
 
@@ -138,12 +124,22 @@ public class MySqlUpdateStatement extends SQLUpdateStatement implements MySqlSta
         this.targetAffectRow = targetAffectRow;
     }
 
-    public SQLOrderBy getOrderBy() {
-        return orderBy;
+    public boolean isForceAllPartitions() {
+        return forceAllPartitions;
     }
 
-    public void setOrderBy(SQLOrderBy orderBy) {
-        this.orderBy = orderBy;
+    public void setForceAllPartitions(boolean forceAllPartitions) {
+        this.forceAllPartitions = forceAllPartitions;
     }
 
+    public SQLName getForcePartition() {
+        return forcePartition;
+    }
+
+    public void setForcePartition(SQLName x) {
+        if (x != null) {
+            x.setParent(this);
+        }
+        this.forcePartition = x;
+    }
 }
